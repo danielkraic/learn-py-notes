@@ -3,6 +3,16 @@
 # http://www.afterhoursprogramming.com/tutorial/Python/
 # https://docs.python.org/3.4/tutorial/index.html
 
+help() # interactive help
+help(sys)
+help(list)
+help(tuple)
+help(dict)
+help(set)
+
+print(print.__doc__)
+print(sys.__doc__)
+
 print('hello')
 print('hello\nhello2')
 print(r'1\n2')
@@ -16,10 +26,14 @@ print('a {0} b {1}'.format(10, 11))
 print('{0:2d} {1:3d} {2:4d}'.format(x, x*x, x*x*x))
 
 print('{0:10} -> {1:5}'.format('a', 'b'))
+'{0:.1f} {1}'.format(size, suffix)
 
 #'!a' (apply ascii()), '!s' (apply str()) and '!r' (apply repr()) can be used to convert the value before it is formatted:
 print('The value of PI is approximately {}.'.format(math.pi))
 print('The value of PI is approximately {!r}.'.format(math.pi))
+
+si_suffixes=['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+'1000{0[0]} = 1{0[1]}'.format(si_suffixes) # '1000KB = 1MB'
 
 #comment
 '''
@@ -62,7 +76,7 @@ print('a' 'b'
 
 type(a)
 type(1.1)
-
+isinstance(1, int)
 ord('c') # 99
 chr(99)  # 'c'
 
@@ -130,8 +144,17 @@ while a < 10:
 'abcd'[:3]
 'abcd'[-3:-1]
 
+#bytes
+b1=b'abcd\x65'
+b1=b'\xff'
+b1=b'abcd\x65'
+ba=bytearray(ba)
+ba[0]=101 # bytearray(b'ebcd')
+s1=b1.decode('ascii')
+b1=s1.encode('ascii')
+
 #lists
-arr=[1,2,3]
+arr = [1,2,3]
 arr += [4,5,6]
 arr[1]
 squares = [x**2 for x in range(10)]
@@ -161,7 +184,8 @@ arr.count(3)
 arr.index(5)
 arr.insert(position, value)
 arr.remove(2)
-v = arr.pop()
+v = arr.pop()  # last item
+v = arr.pop(0) # first item
 arr.sort()
 arr.reverse()
 
@@ -186,31 +210,79 @@ a2=['a', 'b', 'c', 'd']
 for x, y in zip(a1, a2):
     print(x, y)
 
+[i*i for i in [1,2,3]]
+[i for i in range(10) if i % 2 != 0]
+[ (i, i*i) for i in range(10) ]
+
+[os.path.realpath(i) for i in glob.glob('[A-Z]*')]
+[f for f in glob.glob('*.py') if os.stat(f).st_size > 6000]
+
+
 #tuples
 t=(1,2,3)
 t2=()
 t3=(2,)
 mylist=list(t)
 
+v = (1, '2', 3.0)
+(x, y, z) = v
+(Mon, Tue, Wed, Thu, Fri, Sat, Sun) = range(7)
+
 #sets
-st={1,2,3,1,5,3,7}
-a=set('abracadabra')
+s=set()
+s=set('abracadabra')
+s={1,2,3,1,5,3,7}
+s=set(range(5))
 s={x for x in 'abracadabra' if x not in 'abc'}
 s1 - s2
 s1 | s2
 s1 & s2
 s1 ^ s2
 
+s.add(2)
+s1.update(s2) # merge
+s1.update([1,2,3,1,2,3])
+s1.update(range(5))
+s1.discard(2) # ignore if 2 not exists
+s1.remove(2)  # raise KeyError if 2 not exists
+s1.pop()
+s1.clear()
+
+2 in s1
+
+s1={1,2,3,4,5}
+s2={4,5,6,7,8}
+s1.union(s2) #{1, 2, 3, 4, 5, 6, 7, 8}
+s1.intersection(s2) #{4, 5}
+s1.difference(s2) #{1, 2, 3}
+s1.symmetric_difference(s2) #{1, 2, 3, 6, 7, 8}
+
+{1,2}.issubset(s1) #true
+s1.issubset({1,2}) #true
+
 #dict
 d={'val1': 11, 'val2': 12}
+dict(sape=4139, guido=4127, jack=4098)
 d['val1'] = 10
+'val1' in d
+d.keys()
 for i in d:
     print(i, d[i])
 for k,v in d.items():
     print(k, v)
+    
+{i: i*i for i in range(5)}
+{f: os.stat(f).st_size for f in glob.glob('*.py')}
+
+d={os.path.realpath(f): os.stat(f).st_size for f in glob.glob('*.txt') if os.stat(f).st_size != 0}
+for k,v in d.items():
+  print(k, " ", v)
+
+{v,k for k,v in d.items()}
 
 #exceptions
 raise NameError('HiThere')
+raise ValueError('number must be non-negative')
 
 try:
     print('v'+3)
@@ -231,6 +303,11 @@ except:
 else:
     print('file ok...')
     f.close()
+
+try:
+  from lxml import etree
+except ImportError:
+  import xml.etree.ElementTree as etree
 
 #output
 str(obj)
@@ -293,24 +370,42 @@ sys.stdout
 sys.srderr.write('err1')
 
 #os
-os.getcwd()
+os.getcwd() # curr dir, pwd
 os.chdir('/etc')
+os.path.join('/etc', 'sysctl.conf')
+(d, f) = os.path.split('/etc/sysctl.conf')
+(n, e) = os.path.splitext('/etc/sysctl.conf')
+os.expanduser('~')
+os.path.join(os.expanduser('~'), 'code', 'python')
+os.path.exists(p)
+os.path.isdir(p)
+os.path.getsize(p)
+os.path.basename(p)
+os.path.dirname(p)
+metadata=os.stat('/etc/passwd') # metadata,st_size
+os.getenv('PATH')
 os.system('mkdir alsa')
 dir(os)
 help(os)
 
-#shutil
-shutil.move('f1', 'f2')
-
 #glob
 glob.glob('*.py')
+
+#shutil
+shutil.move('f1', 'f2')
 
 #re
 re.findall()
 re.sub()
 
 #math
+math.pi
 math.cos(math.pi/4)
+
+#fractions
+x = fractions.Fraction(1,3)
+x *= 2
+x = fractions.Fraction(6,4) # 3/2
 
 #random
 random.random()
