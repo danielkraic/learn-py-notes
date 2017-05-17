@@ -228,6 +228,7 @@ v = (1, '2', 3.0)
 (x, y, z) = v
 (Mon, Tue, Wed, Thu, Fri, Sat, Sun) = range(7)
 
+
 #sets
 s=set()
 s=set('abracadabra')
@@ -245,8 +246,8 @@ s1.update([1,2,3,1,2,3])
 s1.update(range(5))
 s1.discard(2) # ignore if 2 not exists
 s1.remove(2)  # raise KeyError if 2 not exists
-s1.pop()
 s1.clear()
+s1.pop()
 
 2 in s1
 
@@ -270,7 +271,7 @@ for i in d:
     print(i, d[i])
 for k,v in d.items():
     print(k, v)
-    
+
 {i: i*i for i in range(5)}
 {f: os.stat(f).st_size for f in glob.glob('*.py')}
 
@@ -280,9 +281,47 @@ for k,v in d.items():
 
 {v,k for k,v in d.items()}
 
+
+# generators
+TODO: add more about generators
+# instead of:
+from i in gen():
+    yield i
+# you can write:
+yield from gen()
+
+# unpacking
+a, b, *rest, c = range 10
+a, b, *_, c = range 10
+*_, c = range 10
+
+with open('/etc/passwd') as f:
+   first, *_, last = f.readlines()
+
+def f(*args):
+    a, b, *args = args
+    stuff
+
+# keyword only arguments
+def sum(a, b, *, biteme=False):
+  if biteme:
+      shutil.rmtree('/')
+  else:
+      return a + b
+
+def maxall(*args, key=None):
+    if len(args) == 1:
+      iterable = args[0]
+  else:
+      iterable = args
+  pass
+
+
 #exceptions
 raise NameError('HiThere')
 raise ValueError('number must be non-negative')
+# Chained exceptions
+raise MyError('bla bla') from OSError
 
 try:
     print('v'+3)
@@ -364,6 +403,96 @@ if __name__ == "__main__":
     import sys
     fib(int(sys.argv[1]))
 
+# itertools
+list(itertools.accumulate([1,3,6,1,2,4,9,2,8], max))
+# [1, 3, 6, 6, 6, 6, 9, 9, 9]
+list(itertools.chain(*[range(3), range(4), range(5)]))
+# [0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3, 4]
+list(itertools.combinations(range(3), 2))
+# [(0, 1), (0, 2), (1, 2)]
+list(itertools.combinations_with_replacement(range(3), 2))
+# [(0, 0), (0, 1), (0, 2), (1, 1), (1, 2), (2, 2)]
+list(itertools.compress('ABCDEF', [1,0,1,0,1,1]))
+# ['A', 'C', 'E', 'F']
+list(itertools.permutations(range(3), 2))
+# [(0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1)]
+list(itertools.product(range(3), 'ab'))
+# [(0, 'a'), (0, 'b'), (1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')]
+list(itertools.islice('ABCDEFG', 3))
+# ['A', 'B', 'C']
+list(itertools.islice('ABCDEFG', 3, 6))
+# ['D', 'E', 'F']
+
+def take(n, iterable):
+    "Return first n items of the iterable as a list"
+    return list(islice(iterable, n))
+
+def tabulate(function, start=0):
+    "Return function(0), function(1), ..."
+    return map(function, count(start))
+
+def tail(n, iterable):
+    "Return an iterator over the last n items"
+    # tail(3, 'ABCDEFG') --> E F G
+    return iter(collections.deque(iterable, maxlen=n))
+
+#functools
+@functools.lru_cache(maxsize=300)
+def get_users():
+    # qury db for users
+    pass
+
+get_users.cache_info()
+get_users.cache_clear()
+
+from functools import wraps
+def my_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        print('Calling decorated function')
+        return f(*args, **kwds)
+    return wrapper
+
+@my_decorator
+def example():
+    """Docstring"""
+    print('Called example function')
+
+
+# contextlib
+from contextlib import contextmanager
+@contextmanager
+def tag(name):
+    print("<%s>" % name)
+    yield
+    print("</%s>" % name)
+
+with tag("h1"):
+    print("foo")
+
+# enum
+from enum import Enum
+class Color(Enum):
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+
+for c in Color:
+    print(c, c.name, c.value)
+
+from enum import auto
+class Color(Enum):
+    RED = auto()
+    GREEN = auto()
+    BLUE = auto()
+
+from enum import unique
+@unique
+class Color(Enum):
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+
 #sys
 sys.argv
 sys.stdout
@@ -412,7 +541,6 @@ random.random()
 random.choice(['a', 'b', 'c'])
 
 #datetime
-#time
 import time
 time.time()
 time.ctime()
